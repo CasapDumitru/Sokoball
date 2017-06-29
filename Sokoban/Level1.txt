@@ -1,0 +1,656 @@
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.Border;
+
+//import Clock.UpdateUITask;
+
+public class Level1 extends JFrame implements KeyListener, ActionListener {
+
+	private int miscari = 0;
+	private int miscari_ramase = 10;
+	private JFrame Level1Frame;
+	private JPanel p = new JPanel();;
+	private JPanel p1 = new JPanel();
+	private JLabel NumberMoves;
+	private JLabel moves;
+	private JLabel level;
+	private JLabel movesLeft;
+	private JLabel NumberMovesLeft;
+	private JLabel timp_afiseaza;
+	private Timer timer;
+	private JLabel time_left;
+	private int timp = 10;
+	private int conect_timp = 0;
+	private JButton Exit;
+	private JButton Restart;
+	private JButton NextLevel;
+	private JButton SelectLevel;
+	//private int used_time=0;
+
+	char[][] Level1 = { { '$', '$', '$', '$', '$'  },
+			            { '$', '-', '-', '-', '$'  }, 
+			             { '$', '-', '$', '-', '$'},
+			             { '$', '#', '-', '#', '$' }, 
+			           { '$', '-', '+', '-', '$'   },
+			           };
+	int[] row_dest = { 1,1 };
+	int[] col_dest = { 1,3 };
+	SokobanModel sokoban = new SokobanModel(4, 2, row_dest, col_dest, Level1);
+
+	public Level1(JFrame frame) {
+		Level1Frame = frame;
+
+		p.setLayout(new GridLayout(5, 5));
+		for (int i = 0; i < 5; i++) {
+			for (int j = 0; j < 5; j++) {
+				switch (sokoban.getTable()[i][j]) {
+				case '$':
+					p.add(new DesenPerete());
+					break;
+				case '-':
+					int z = 0;
+					for (int k = 0; k < row_dest.length; k++) {
+						if (row_dest[k] == i && col_dest[k] == j)
+							z++;
+					}
+					if (z == 0) {
+						p.add(new DesenWhite());
+					} else
+						p.add(new DesenDest());
+
+					break;
+				case '#':
+					int y = 0;
+					for (int k = 0; k < row_dest.length; k++) {
+						if (row_dest[k] == i && col_dest[k] == j)
+							y++;
+					}
+					if (y == 0)
+						p.add(new DesenBall());
+					else
+						p.add(new DesenBallFCB());
+
+					break;
+				case '+':
+					p.add(new DesenMessi());
+					break;
+				default:
+				}
+			}
+		}
+
+		Exit = new JButton("Exit");
+		Exit.addActionListener(this);
+		Exit.setAlignmentX(CENTER_ALIGNMENT);
+
+		Restart = new JButton("Restart");
+		Restart.addActionListener(this);
+		Restart.setAlignmentX(CENTER_ALIGNMENT);
+		
+		NextLevel=new JButton("Next Level");
+		NextLevel.addActionListener(this);
+		NextLevel.setAlignmentX(CENTER_ALIGNMENT);
+		
+		SelectLevel=new JButton("Select Level");
+		SelectLevel.addActionListener(this);
+		SelectLevel.setAlignmentX(CENTER_ALIGNMENT);
+
+		level = new JLabel();
+		level.setText("LEVEL1");
+		level.setForeground(Color.RED);
+		level.setFont(new Font("Serif", Font.PLAIN, 50));
+		Border border = BorderFactory.createLineBorder(Color.RED, 10);
+		level.setBorder(border);
+		level.setAlignmentX(CENTER_ALIGNMENT);
+
+		moves = new JLabel();
+		moves.setText("MOVES");
+		moves.setForeground(Color.RED);
+		moves.setFont(new Font("Serif", Font.PLAIN, 50));
+		moves.setAlignmentX(CENTER_ALIGNMENT);
+
+		NumberMoves = new JLabel();
+		NumberMoves.setText("" + miscari);
+		NumberMoves.setForeground(Color.RED);
+		NumberMoves.setFont(new Font("Serif", Font.PLAIN, 30));
+		NumberMoves.setAlignmentX(CENTER_ALIGNMENT);
+
+		movesLeft = new JLabel();
+		movesLeft.setText("Moves Left");
+		movesLeft.setForeground(Color.RED);
+		movesLeft.setFont(new Font("Serif", Font.PLAIN, 50));
+		movesLeft.setAlignmentX(CENTER_ALIGNMENT);
+
+		NumberMovesLeft = new JLabel();
+		NumberMovesLeft.setText("" + miscari_ramase);
+		NumberMovesLeft.setForeground(Color.RED);
+		NumberMovesLeft.setFont(new Font("Serif", Font.PLAIN, 30));
+		NumberMovesLeft.setAlignmentX(CENTER_ALIGNMENT);
+
+		
+		time_left=new JLabel();
+		time_left.setText(" Time Left ");
+		time_left.setForeground(Color.RED);
+		time_left.setFont(new Font("Serif", Font.PLAIN, 30));
+		time_left.setAlignmentX(CENTER_ALIGNMENT);
+		
+		
+		timer = new Timer();
+		timp_afiseaza = new JLabel();
+		timp_afiseaza.setText("" + timp);
+		timp_afiseaza.setForeground(Color.RED);
+		timp_afiseaza.setFont(new Font("Serif", Font.PLAIN, 30));
+		timp_afiseaza.setAlignmentX(CENTER_ALIGNMENT);
+		// timer.schedule(new UpdateUITask(), 0,1000);
+
+		p1.setPreferredSize(new Dimension(300, 500));
+		p1.setBackground(new Color(132, 31, 39));
+		p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
+		p1.add(level);
+		p1.add(moves);
+		p1.add(NumberMoves);
+		p1.add(movesLeft);
+		p1.add(NumberMovesLeft);
+		p1.add(time_left);
+		p1.add(timp_afiseaza);
+		p1.add(Restart);
+		p1.add(NextLevel);
+		p1.add(SelectLevel);
+		p1.add(Exit);
+		
+
+		p.setFocusable(true);
+		p.requestFocusInWindow();
+		p.addKeyListener(this);
+
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setSize(1300, 700);
+		setResizable(false);
+		setLayout(new BorderLayout());
+		this.add(p);
+		this.add(p1, BorderLayout.EAST);
+
+		// p1.addMouseListener(this);
+		setVisible(true);
+
+	}
+
+	private class UpdateUITask extends TimerTask {
+
+		@Override
+		public void run() {
+			//used_time++;
+			EventQueue.invokeLater(new Runnable() {
+
+				@Override
+				public void run() {
+
+					
+					if (timp == 0) {
+						timp_afiseaza.setText(String.valueOf(0));
+						level.setText("YOU LOST");
+					   timer.cancel();
+					  p.disable();
+
+					} else {
+						
+						timp_afiseaza.setText(String.valueOf(timp));
+					}
+
+					if (timp <= 5) {
+						int k = -1;
+						for (int i = 0; i < 5; i++) {
+							for (int j = 0; j < 5; j++) {
+								k++;
+								
+								if (sokoban.getTable()[i][j] == '#') {
+									p.remove(k);
+									int y = 0;
+									for (int q = 0; q < row_dest.length; q++) {
+										if (row_dest[q] == i && col_dest[q] == j)
+											y++;
+									}
+									if (y == 0) {
+										p.add(new DesenBrokenBall1(), k);
+										p.revalidate();
+										p.repaint();
+									} else {
+										p.add(new DesenBallFCB(), k);
+										p.revalidate();
+										p.repaint();
+									}
+
+								}
+							}
+						}
+
+					}
+					
+					if(timp==0){
+						int k = -1;
+						for (int i = 0; i < 5; i++) {
+							for (int j = 0; j < 5; j++) {
+								k++;
+								
+								if (sokoban.getTable()[i][j] == '#') {
+									p.remove(k);
+									int y = 0;
+									for (int q = 0; q < row_dest.length; q++) {
+										if (row_dest[q] == i && col_dest[q] == j)
+											y++;
+									}
+									if (y == 0) {
+										p.add(new DesenBrokenBall(), k);
+										p.revalidate();
+										p.repaint();
+									} else {
+										p.add(new DesenBallFCB(), k);
+										p.revalidate();
+										p.repaint();
+									}
+
+								}
+							}
+						}
+					}
+					timp--;
+
+				}
+			});
+		}
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+
+		// timer.schedule(new UpdateUITask(), 0,1000);
+		int keycode = e.getKeyCode();
+		if (keycode == KeyEvent.VK_UP || keycode == KeyEvent.VK_DOWN || keycode == KeyEvent.VK_LEFT
+				|| keycode == KeyEvent.VK_RIGHT) {
+
+			conect_timp++;
+		}
+
+		if (conect_timp == 1) {
+			timer.schedule(new UpdateUITask(), 0, timp * 100);
+		}
+		int r = sokoban.row;
+		int w = sokoban.col;
+		if (keycode == KeyEvent.VK_UP) {
+
+			sokoban.moveUp();
+
+			if (r == sokoban.row && w == sokoban.col) {
+			} else {
+
+				miscari++;
+				NumberMoves.setText("" + miscari);
+				miscari_ramase--;
+				NumberMovesLeft.setText("" + miscari_ramase);
+				int k = -1;
+				for (int i = 0; i < 5; i++) {
+					for (int j = 0; j < 5; j++) {
+						k++;
+						p.remove(k);
+						switch (sokoban.getTable()[i][j]) {
+						case '$':
+							p.add(new DesenPerete(), k);
+							p.revalidate();
+							p.repaint();
+							break;
+						case '-':
+							int z = 0;
+							for (int q = 0; q < row_dest.length; q++) {
+								if (row_dest[q] == i && col_dest[q] == j)
+									z++;
+							}
+							if (z == 0) {
+								p.add(new DesenWhite(), k);
+								p.revalidate();
+								p.repaint();
+							} else {
+								p.add(new DesenDest(), k);
+								p.revalidate();
+								p.repaint();
+							}
+							break;
+						case '#':
+							int y = 0;
+							for (int q = 0; q < row_dest.length; q++) {
+								if (row_dest[q] == i && col_dest[q] == j)
+									y++;
+							}
+							if (y == 0) {
+								if(timp<5 && timp>0)
+								{
+									p.add(new DesenBrokenBall1(), k);	
+								}
+								else if(timp==0)
+								{
+									p.add(new DesenBrokenBall(), k);
+								}
+								else
+								{
+									p.add(new DesenBall(), k);	
+								}
+								
+								p.revalidate();
+								p.repaint();
+							} else {
+								p.add(new DesenBallFCB(), k);
+								p.revalidate();
+								p.repaint();
+							}
+							break;
+						case '+':
+							p.add(new DesenMessi(), k);
+							p.revalidate();
+							p.repaint();
+							break;
+						default:
+						}
+					}
+				}
+			}
+
+		} else if (keycode == KeyEvent.VK_DOWN) {
+			sokoban.moveDown();
+			if (r == sokoban.row && w == sokoban.col) {
+			} else {
+				miscari++;
+				NumberMoves.setText("" + miscari);
+				miscari_ramase--;
+				NumberMovesLeft.setText("" + miscari_ramase);
+				int k = -1;
+				for (int i = 0; i < 5; i++) {
+					for (int j = 0; j < 5; j++) {
+						k++;
+						p.remove(k);
+						switch (sokoban.getTable()[i][j]) {
+						case '$':
+							p.add(new DesenPerete(), k);
+							p.revalidate();
+							p.repaint();
+							break;
+						case '-':
+							int z = 0;
+							for (int q = 0; q < row_dest.length; q++) {
+								if (row_dest[q] == i && col_dest[q] == j)
+									z++;
+							}
+							if (z == 0) {
+								p.add(new DesenWhite(), k);
+								p.revalidate();
+								p.repaint();
+							} else {
+								p.add(new DesenDest(), k);
+								p.revalidate();
+								p.repaint();
+							}
+							break;
+						case '#':
+							int y = 0;
+							for (int q = 0; q < row_dest.length; q++) {
+								if (row_dest[q] == i && col_dest[q] == j)
+									y++;
+							}
+							if (y == 0) {
+								if(timp<5 && timp>0)
+								{
+									p.add(new DesenBrokenBall1(), k);	
+								}
+								else if(timp==0)
+								{
+									p.add(new DesenBrokenBall(), k);
+								}
+								else
+								{
+									p.add(new DesenBall(), k);	
+								}
+								p.revalidate();
+								p.repaint();
+							} else {
+								p.add(new DesenBallFCB(), k);
+								p.revalidate();
+								p.repaint();
+							}
+							break;
+						case '+':
+							p.add(new DesenMessi(), k);
+							p.revalidate();
+							p.repaint();
+							break;
+						default:
+						}
+					}
+				}
+			}
+
+		} else if (keycode == KeyEvent.VK_LEFT) {
+
+			sokoban.moveLeft();
+			if (r == sokoban.row && w == sokoban.col) {
+			} else {
+				miscari++;
+				NumberMoves.setText("" + miscari);
+				miscari_ramase--;
+				NumberMovesLeft.setText("" + miscari_ramase);
+				int k = -1;
+				for (int i = 0; i < 5; i++) {
+					for (int j = 0; j < 5; j++) {
+						k++;
+						p.remove(k);
+						switch (sokoban.getTable()[i][j]) {
+						case '$':
+							p.add(new DesenPerete(), k);
+							p.revalidate();
+							p.repaint();
+							break;
+						case '-':
+							int z = 0;
+							for (int q = 0; q < row_dest.length; q++) {
+								if (row_dest[q] == i && col_dest[q] == j)
+									z++;
+							}
+							if (z == 0) {
+								p.add(new DesenWhite(), k);
+								p.revalidate();
+								p.repaint();
+							} else {
+								p.add(new DesenDest(), k);
+								p.revalidate();
+								p.repaint();
+							}
+							break;
+						case '#':
+							int y = 0;
+							for (int q = 0; q < row_dest.length; q++) {
+								if (row_dest[q] == i && col_dest[q] == j)
+									y++;
+							}
+							if (y == 0) {
+								if(timp<5 && timp>0)
+								{
+									p.add(new DesenBrokenBall1(), k);	
+								}
+								else if(timp==0)
+								{
+									p.add(new DesenBrokenBall(), k);
+								}
+								else
+								{
+									p.add(new DesenBall(), k);	
+								}
+								p.revalidate();
+								p.repaint();
+							} else {
+								p.add(new DesenBallFCB(), k);
+								p.revalidate();
+								p.repaint();
+							}
+							break;
+						case '+':
+							p.add(new DesenMessi(), k);
+							p.revalidate();
+							p.repaint();
+							break;
+						default:
+						}
+					}
+				}
+			}
+
+		} else if (keycode == KeyEvent.VK_RIGHT) {
+			sokoban.moveRight();
+			if (r == sokoban.row && w == sokoban.col) {
+			} else {
+				miscari++;
+				NumberMoves.setText("" + miscari);
+				miscari_ramase--;
+				NumberMovesLeft.setText("" + miscari_ramase);
+				int k = -1;
+				for (int i = 0; i < 5; i++) {
+					for (int j = 0; j < 5; j++) {
+						k++;
+						p.remove(k);
+						switch (sokoban.getTable()[i][j]) {
+						case '$':
+							p.add(new DesenPerete(), k);
+							p.revalidate();
+							p.repaint();
+							break;
+						case '-':
+							int z = 0;
+							for (int q = 0; q < row_dest.length; q++) {
+								if (row_dest[q] == i && col_dest[q] == j)
+									z++;
+							}
+							if (z == 0) {
+								p.add(new DesenWhite(), k);
+								p.revalidate();
+								p.repaint();
+							} else {
+								p.add(new DesenDest(), k);
+								p.revalidate();
+								p.repaint();
+							}
+							break;
+						case '#':
+							int y = 0;
+							for (int q = 0; q < row_dest.length; q++) {
+								if (row_dest[q] == i && col_dest[q] == j)
+									y++;
+							}
+							if (y == 0) {
+								if(timp<5 && timp>0)
+								{
+									p.add(new DesenBrokenBall1(), k);	
+								}
+								else if(timp==0)
+								{
+									p.add(new DesenBrokenBall(), k);
+								}
+								else
+								{
+									p.add(new DesenBall(), k);	
+								}
+								p.revalidate();
+								p.repaint();
+							} else {
+								p.add(new DesenBallFCB(), k);
+								p.revalidate();
+								p.repaint();
+							}
+							break;
+						case '+':
+							p.add(new DesenMessi(), k);
+							p.revalidate();
+							p.repaint();
+							break;
+						default:
+						}
+					}
+				}
+			}
+		}
+		if (sokoban.win() == true) {
+			timer.cancel();
+			level.setText("YOU WON");
+			p1.remove(NumberMovesLeft);
+			p1.remove(movesLeft);
+			p1.remove(NumberMoves);
+			p1.remove(movesLeft);
+			p1.remove(time_left);
+			p1.remove(timp_afiseaza);
+			p1.remove(moves);
+			p1.remove(NumberMoves);
+			//time_left.setText("Used Time");
+			//timp_afiseaza.setText(" "+used_time);
+			p.disable();
+			
+
+		} else if (miscari_ramase == 0) {
+			level.setText("YOU LOST");
+			p.disable();
+			timer.cancel();
+		} //else if (timp == -1) {
+		//	level.setText("YOU LOST");
+		//	p.disable();
+		//}
+
+	}
+
+	@Override
+	public void keyReleased(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void keyTyped(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		JButton button = (JButton) e.getSource();
+		String str = button.getActionCommand();
+		if (str.equals("Exit")) {
+			System.exit(0);
+		} else if (str.equals("Restart")) {
+			new Level1(Level1Frame);
+		}
+		else if (str.equals("Select Level")) {
+	        this.remove(p);
+	       this.remove(p1);
+			new SelectLevel(this);
+			this.revalidate();
+			this.repaint();
+			//menuFrame.repaint();
+			//new Menu(Level1Frame);
+		}
+		else if (str.equals("Next Level")) {
+			//new Level2(Level1Frame);
+		}
+
+	}
+
+}
